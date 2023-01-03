@@ -1,0 +1,57 @@
+version: '3.7'
+
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.40.0
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    restart: always
+
+  thanos-sidecar-1:
+    container_name: thanos-sidecar-1
+    image: quay.io/thanos/thanos:v0.29.0
+    command:
+      - 'sidecar'
+      - '--tsdb.path=/prometheus'
+      - '--prometheus.url=http://prometheus:9090'
+      - '--grpc-address=0.0.0.0:10091'
+      - '--http-address=0.0.0.0:10902'
+    depends_on:
+      - prometheus
+    restart: always
+
+  thanos-query-frontend:
+    container_name: thanos-query-frontend
+    image: quay.io/thanos/thanos:v0.29.0
+    command:
+      - 'query-frontend'
+      - '--http-address=0.0.0.0:10901'
+      - '--query-frontend.downstream-url=http://thanos-querier:10902'
+    ports:
+      - "10901:10901"
+    depends_on:
+      - thanos-querier
+    restart: always
+
+  thanos-querier:
+    container_name: thanos-querier
+    image: quay.io/thanos/thanos:v0.29.0
+    command:
+      - 'query'
+      - '--grpc-address=0.0.0.0:10091'
+      - '--http-address=0.0.0.0:10902'
+      - '--query.replica-label=replica'
+      - '--store=thanos-sidecar-1:10091'
+    ports:
+      - "10902:10902"
+    depends_on:
+      - thanos-sidecar-1
+    restart: always

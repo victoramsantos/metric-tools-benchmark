@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  avalanche:
+    container_name: avalanche
+    image: quay.io/freshtracks.io/avalanche:latest
+    command: #more args at https://github.com/prometheus-community/avalanche/blob/main/cmd/avalanche.go#L33
+      - "--metric-count=1000"
+      - "--series-count=50"
+      - "--port=9001"
+    ports:
+      - "9001:9001"
+    restart: always
