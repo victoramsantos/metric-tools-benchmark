@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: avalanche-loadtest
+  name: avalanche-loadtest-deployment
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: avalanche-loadtest
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 0%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: avalanche-loadtest
+    spec:
+      containers:
+        - env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          image: victoramsantos/avalanche:latest
+#          image: quay.io/freshtracks.io/avalanche:latest #or this image for official repository
+          imagePullPolicy: IfNotPresent
+          name: avalanche-loadtest
+          args:
+          - "--metric-count=10"
+          - "--histogram-count=10"
+          - "--histogram-bucket=15"
+          - "--typed-name=true"
+          - "--series-count=50"
+          - "--port=9001"
+          livenessProbe:
+            tcpSocket:
+              port: 9001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 9001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          ports:
+            - containerPort: 9001
+              name: port9001
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 716M
+            requests:
+              cpu: 150m
+              memory: 512M
+      restartPolicy: Always
