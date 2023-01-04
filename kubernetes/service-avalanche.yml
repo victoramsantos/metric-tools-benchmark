@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: avalanche-loadtest
+  name: avalanche-loadtest-service
+spec:
+  ports:
+    - name: "9001"
+      port: 9001
+      protocol: TCP
+  selector:
+    name: avalanche-loadtest
