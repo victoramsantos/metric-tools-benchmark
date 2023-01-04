@@ -17,3 +17,7 @@ In this fork we enabled metrics as `histogram` and changed the default name of t
 
 We created the [scripts/metrics-extractor.sh](scripts/metrics-extractor.sh) which queries a Prometheus-like API to 
 retrieve all metrics and generate an output only the `avalanche` metrics filtered.
+
+## Kubernetes
+
+In the [kubernetes/](kubernetes/) folder you can find the reference to kubernetes manifest for deploy.
