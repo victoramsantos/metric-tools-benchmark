@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  avalanche:
+    container_name: avalanche
+    image: avalanche-local:latest
+    command: #more args at https://github.com/victoramsantos/avalanche/blob/main/cmd/avalanche.go#L33
+      - "--metric-count=10"
+      - "--histogram-count=10"
+      - "--histogram-bucket=15"
+      - "--typed-name=true"
+      - "--series-count=50"
+      - "--port=9001"
+    ports:
+      - "9001:9001"
+    restart: always
