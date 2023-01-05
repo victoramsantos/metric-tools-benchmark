@@ -18,6 +18,7 @@ TYPES="histogram gauge"
 JS_EXPORTER=""
 for type in $TYPES; do
   metrics=$(cat $METRICS_FILE | jq -c '.data[] | select(contains("'${type}'"))')
+  metrics=$(sed '$!s/$/,/' <<< $metrics)
   JS_EXPORTER="${type}_metrics,${JS_EXPORTER}"
 
 cat <<EOF >> ${OUTPUT_FILE}
