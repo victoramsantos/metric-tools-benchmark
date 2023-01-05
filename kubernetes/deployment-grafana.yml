@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: grafana
+  name: grafana-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: grafana
+  template:
+    metadata:
+      labels:
+        name: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: GF_SECURITY_ADMIN_PASSWORD
+            value: "root"
+          - name: GF_USERS_ALLOW_SIGN_UP
+            value: "false"
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        ports:
+          - containerPort: 3000
+            name: port3000
+            protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 716M
+          requests:
+            cpu: 150m
+            memory: 512M
+        volumeMounts:
+          - name: grafana-config-volume
+            mountPath: /etc/grafana/provisioning/datasources/
+      volumes:
+        - name: grafana-config-volume
+          configMap:
+            defaultMode: 420
+            name: grafana-configmap
+      restartPolicy: Always

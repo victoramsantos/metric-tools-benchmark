@@ -25,11 +25,6 @@ scrape_configs:
           - 'thanos-sidecar-1:10902'
           - 'thanos-querier:10902'
 
-  - job_name: 'cadvisor'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['cadvisor:8080']
-
   - job_name: 'avalanche'
     scrape_interval: 5s
     static_configs:
