@@ -30,6 +30,10 @@ To simulate a real scenario with kubernetes, we create a small environment which
 This tool will create a local kubernetes cluster. Running the [kubernetes-up.sh](kubernetes-up.sh) script, you will create
 a kind cluster and apply all manifests. 
 
+You must export Prometheus locally running `kubectl port-forward svc/prometheus-service 9090:9090` and run the [scripts/metrics-extractor.sh](scripts/metrics-extractor.sh)
+to generate the `metrics.js` file. After that, update the [kubernetes/configmap-k6.yml](kubernetes/configmap-k6.yml) overwriting
+the sample template.
+
 After created, you can run `kubectl port-forward svc/grafana-service 3000:3000` to access Grafana at [http://localhost:3000](http://localhost:3000).
 We also added a dashboard to follow the K6 running, which can be accessed in [http://localhost:3000/d/01npcT44k/test-result?orgId=1&refresh=5s](http://localhost:3000/d/01npcT44k/test-result?orgId=1&refresh=5s).
 

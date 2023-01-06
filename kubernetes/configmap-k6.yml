@@ -7,49 +7,11 @@ metadata:
 data:
   metrics.js: |-
     const histogram_metrics = [
-    "avalanche_histogram_hhhhh_0_0_bucket",
-    "avalanche_histogram_hhhhh_0_0_count",
-    "avalanche_histogram_hhhhh_0_0_sum",
-    "avalanche_histogram_hhhhh_0_1_bucket",
-    "avalanche_histogram_hhhhh_0_1_count",
-    "avalanche_histogram_hhhhh_0_1_sum",
-    "avalanche_histogram_hhhhh_0_2_bucket",
-    "avalanche_histogram_hhhhh_0_2_count",
-    "avalanche_histogram_hhhhh_0_2_sum",
-    "avalanche_histogram_hhhhh_0_3_bucket",
-    "avalanche_histogram_hhhhh_0_3_count",
-    "avalanche_histogram_hhhhh_0_3_sum",
-    "avalanche_histogram_hhhhh_0_4_bucket",
-    "avalanche_histogram_hhhhh_0_4_count",
-    "avalanche_histogram_hhhhh_0_4_sum",
-    "avalanche_histogram_hhhhh_0_5_bucket",
-    "avalanche_histogram_hhhhh_0_5_count",
-    "avalanche_histogram_hhhhh_0_5_sum",
-    "avalanche_histogram_hhhhh_0_6_bucket",
-    "avalanche_histogram_hhhhh_0_6_count",
-    "avalanche_histogram_hhhhh_0_6_sum",
-    "avalanche_histogram_hhhhh_0_7_bucket",
-    "avalanche_histogram_hhhhh_0_7_count",
-    "avalanche_histogram_hhhhh_0_7_sum",
-    "avalanche_histogram_hhhhh_0_8_bucket",
-    "avalanche_histogram_hhhhh_0_8_count",
-    "avalanche_histogram_hhhhh_0_8_sum",
-    "avalanche_histogram_hhhhh_0_9_bucket",
-    "avalanche_histogram_hhhhh_0_9_count",
-    "avalanche_histogram_hhhhh_0_9_sum"
+    "up"
     ];
     
     const gauge_metrics = [
-    "avalanche_gauge_mmmmm_0_0",
-    "avalanche_gauge_mmmmm_0_1",
-    "avalanche_gauge_mmmmm_0_2",
-    "avalanche_gauge_mmmmm_0_3",
-    "avalanche_gauge_mmmmm_0_4",
-    "avalanche_gauge_mmmmm_0_5",
-    "avalanche_gauge_mmmmm_0_6",
-    "avalanche_gauge_mmmmm_0_7",
-    "avalanche_gauge_mmmmm_0_8",
-    "avalanche_gauge_mmmmm_0_9"
+    "up"
     ];
     
     export {gauge_metrics,histogram_metrics};
