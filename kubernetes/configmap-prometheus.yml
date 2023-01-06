@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-configmap
+  labels:
+    name: prometheus-configmap
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 5s  # By default, scrape targets every 15 seconds.
+      evaluation_interval: 5s  # By default, scrape targets every 15 seconds.
+      # scrape_timeout is set to the global default (10s).
+    
+      # Attach these labels to any time series or alerts when communicating with
+      # external systems (federation, remote storage, Alertmanager).
+      external_labels:
+        cluster: 'my-little-prom'
+        replica: 'r1'
+    
+    scrape_configs:
+      - job_name: 'prometheus'
+        scrape_interval: 5s
+    
+        static_configs:
+          - targets: ['localhost:9090']
+    
+      - job_name: 'avalanche'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['avalanche-loadtest-service.default.svc.cluster.local:9001']
+    
+      - job_name: cadvisor
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['cadvisor-service.default.svc.cluster.local:8080']
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - source_labels: [__address__]
+            regex: (.+):(?:\d+)
+            target_label: instance
+            replacement: ${1}
+
+        metric_relabel_configs:
+        - source_labels: [__name__]
+          regex: container_tasks_state
+          action: drop
+        - source_labels: [__name__, interface]
+          regex: container_network.+;(?:tun.+|dummy.+|kube-.+|docker.+)
+          action: drop
+        - source_labels: [__name__, scope]
+          regex: container_memory_.+;hierarchy
+          action: drop
+        - source_labels: [__name__]
+          regex: container_spec_memory_(limit_bytes|swap_limit_bytes)
+          action: drop
+        - source_labels: [__name__]
+          regex: container_network_(tcp|udp)_usage_total
+          action: drop
+        - source_labels: [__name__]
+          regex: container_cpu_(user_seconds_total|system_seconds_total|load_average_10s|cfs_.+)
+          action: drop
+        - source_labels: [__name__]
+          regex: container_fs_(inodes_.+|limit_bytes|reads_merged_total|read_seconds_total|writes_merged_total|write_seconds_total|io_.+|sector_.+|usage_bytes|writes_total|reads_total)
+          action: drop
+        - source_labels: [__name__]
+          regex: container_memory_(mapped_file)
+          action: drop
+        - regex: 'beta_kubernetes_io_arch'
+          action: labeldrop
+        - regex: 'beta_kubernetes_io_os'
+          action: labeldrop
+        - regex: 'beta_kubernetes_io_instance_type'
+          action: labeldrop
+        - regex: 'failure_domain_beta_kubernetes_io_region'
+          action: labeldrop
+        - regex: 'failure_domain_beta_kubernetes_io_zone'
+          action: labeldrop
+        - source_labels: [container_name]
+          target_label: container
+        - source_labels: [pod_name]
+          target_label: pod

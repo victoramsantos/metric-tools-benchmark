@@ -1,23 +1,40 @@
 # metric-tools-benchmark
-Benchmark tooling for [Thanos](https://thanos.io/), [Mimir](https://grafana.com/oss/mimir/) and [Victoriametrics](https://victoriametrics.com/). 
+Benchmark tooling for [Prometheus](https://prometheus.io), [Thanos](https://thanos.io/), [Mimir](https://grafana.com/oss/mimir/) and [Victoriametrics](https://victoriametrics.com/). 
 
-## Running
+## Running With Docker Locally
 
-Each folder has `docker-compose` files to instantiate the stack and [Avalanche](https://github.com/prometheus-community/avalanche) (the tool we use
-to generate metrics).
+Each folder has a bootstrap script `up.sh` which instantiate the monitoring tool ([Grafana](https://grafana.com/)), the referenced tool
+(i.e. Prometheus, Thanos, Mimir or Victoriametrics), a container of [Avalanche](https://github.com/prometheus-community/avalanche) 
+to be scraped and a container of [K6](https://k6.io/) used to create random requests to our environment.
+
+We deployed a dashboard to follow K6 requests at [http://localhost:3000/d/01npcT44k/test-result?orgId=1&refresh=5s](http://localhost:3000/d/01npcT44k/test-result?orgId=1&refresh=5s).
+
+When finished, you can delete the environment running the `down.sh` script.
 
 ## About Avalanche
 
-It's possible to run a standalone version of Avalanche in [avalanche/docker-compose-standalone.yml](avalanche/docker-compose-standalone.yml). 
-This `docker-compose` point out to original docker image repository (i.e: [quay.io/freshtracks.io/avalanche](https://quay.io/repository/freshtracks.io/avalanche)).
-However, to improve our tests we create a fork of this repository which can be found in [https://github.com/victoramsantos/avalanche](https://github.com/victoramsantos/avalanche).
+We created a fork of Avalanche which can be found in [https://github.com/victoramsantos/avalanche](https://github.com/victoramsantos/avalanche).
 In this fork we enabled metrics as `histogram` and changed the default name of the generated metrics to have the metric type.
+We also upload it's docker image to [https://hub.docker.com/repository/docker/victoramsantos/avalanche](https://hub.docker.com/repository/docker/victoramsantos/avalanche).
 
-## Scripts
 
-We created the [scripts/metrics-extractor.sh](scripts/metrics-extractor.sh) which queries a Prometheus-like API to 
-retrieve all metrics and generate an output only the `avalanche` metrics filtered.
+## About K6
+
+We customized a runtime of K6 to run using the exported metrics from Avalanche. This [image](https://hub.docker.com/repository/docker/victoramsantos/k6) uses the output of [scripts/metrics-extractor.sh](scripts/metrics-extractor.sh)
+to generate a `metrics.js` file which breaks the metrics into two arrays (`histogram_metrics` and `gauge_metrics`).
+This file is used by our K6 image to generate some queries to a Prometheus-like API.
 
 ## Kubernetes
 
-In the [kubernetes/](kubernetes/) folder you can find the reference to kubernetes manifest for deploy.
+To simulate a real scenario with kubernetes, we create a small environment which can be deployed locally using [Kind](https://kind.sigs.k8s.io/).
+This tool will create a local kubernetes cluster. Running the [kubernetes-up.sh](kubernetes-up.sh) script, you will create
+a kind cluster and apply all manifests. 
+
+You must export Prometheus locally running `kubectl port-forward svc/prometheus-service 9090:9090` and run the [scripts/metrics-extractor.sh](scripts/metrics-extractor.sh)
+to generate the `metrics.js` file. After that, update the [kubernetes/configmap-k6.yml](kubernetes/configmap-k6.yml) overwriting
+the sample template.
+
+After created, you can run `kubectl port-forward svc/grafana-service 3000:3000` to access Grafana at [http://localhost:3000](http://localhost:3000).
+We also added a dashboard to follow the K6 running, which can be accessed in [http://localhost:3000/d/01npcT44k/test-result?orgId=1&refresh=5s](http://localhost:3000/d/01npcT44k/test-result?orgId=1&refresh=5s).
+
+When finished, you can run [kubernetes-down.sh](kubernetes-down.sh) which delete the kind cluster and all PODs created.
