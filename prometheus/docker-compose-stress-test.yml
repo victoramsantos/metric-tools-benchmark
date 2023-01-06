@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  k6:
+    container_name: k6
+    image: k6-local:latest
+    volumes:
+      - ./metrics.js/:/home/k6/metrics.js
+    command:
+      - 'run'
+      - '-e'
+      - 'HOST=http://host.docker.internal:9090'
+      - '-e'
+      - 'K6_PROMETHEUS_RW_SERVER_URL=http://host.docker.internal:9090/api/v1/write'
+      - '-o'
+      - 'experimental-prometheus-rw'
+      - './test.js'
+    restart: unless-stopped

@@ -5,7 +5,7 @@ PROMETHEUS_URL=http://localhost:9090
 TARGET_JOB=avalanche
 PRETTY_JSON=false
 METRICS_FILE=metrics.json
-OUTPUT_FILE=output.js
+OUTPUT_FILE=metrics.js
 
 curl -XGET -G "${PROMETHEUS_URL}/api/v1/label/__name__/values" \
   --data-urlencode "match[]={job=\"${TARGET_JOB}\"}" > $METRICS_FILE

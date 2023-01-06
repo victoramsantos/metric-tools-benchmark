@@ -1,7 +1,10 @@
 apiVersion: 1
 
 datasources:
-  - name: Thanos
+  - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://host.docker.internal:10902
+    editable: true
+    uid: some-unique-uid
+    isDefault: true
+    url: http://host.docker.internal:9090

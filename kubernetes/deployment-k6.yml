@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: k6
+  name: k6-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: k6
+  template:
+    metadata:
+      labels:
+        name: k6
+    spec:
+      containers:
+      - image: victoramsantos/k6:latest
+        imagePullPolicy: IfNotPresent
+        name: k6
+        command:
+          - 'k6'
+          - 'run'
+          - '-e'
+          - 'HOST=http://prometheus-service.default.svc.cluster.local:9090'
+          - '-e'
+          - 'K6_PROMETHEUS_RW_SERVER_URL=http://prometheus-service.default.svc.cluster.local:9090/api/v1/write'
+          - '-o'
+          - 'experimental-prometheus-rw'
+          - '/home/k6/test.js'
+        resources:
+          limits:
+            cpu: 500m
+            memory: 716M
+          requests:
+            cpu: 150m
+            memory: 512M
+        volumeMounts:
+          - name: k6-config-volume
+            mountPath: /home/k6/metrics.js
+            subPath: metrics.js
+      volumes:
+        - name: k6-config-volume
+          configMap:
+            defaultMode: 420
+            name: k6-configmap

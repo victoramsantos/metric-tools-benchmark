@@ -45,11 +45,17 @@ spec:
             cpu: 150m
             memory: 512M
         volumeMounts:
-          - name: grafana-config-volume
-            mountPath: /etc/grafana/provisioning/datasources/
+          - name: grafana-datasources
+            mountPath: /etc/grafana/provisioning/datasources
+          - name: grafana-dashboards
+            mountPath: /etc/grafana/provisioning/dashboards/
       volumes:
-        - name: grafana-config-volume
+        - name: grafana-datasources
           configMap:
             defaultMode: 420
-            name: grafana-configmap
+            name: grafana-datasources-configmap
+        - name: grafana-dashboards
+          configMap:
+            defaultMode: 420
+            name: grafana-dashboards-configmap
       restartPolicy: Always
